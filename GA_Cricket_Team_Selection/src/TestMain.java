@@ -7,6 +7,12 @@ import org.jenetics.*;
 import org.jenetics.engine.*;
 import org.jenetics.util.IntRange;
 
+import enums.OtherPlayerTypes;
+import enums.PitchType;
+import ga.FitnessCalculator;
+import ga.PlayerDetails;
+import objects.PlayerStatistics;
+
 public class TestMain {
     
     private static double fitness(final int [] x) {

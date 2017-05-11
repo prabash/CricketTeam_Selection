@@ -1,4 +1,9 @@
+package objects;
+
 import java.util.List;
+
+import enums.OtherPlayerTypes;
+import enums.PlayerType;
 
 public class PlayerStatistics {
 

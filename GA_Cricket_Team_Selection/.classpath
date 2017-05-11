@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="C:/Users/Prabash/Documents/MSc. in AI/Evolutionary Computing/jenetics-3.8.0/lib/jenetics-3.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Prabash/Documents/MSc. in AI/Evolutionary Computing/jenetics-3.8.0/lib/jenetix-3.8.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Prabash/Documents/MSc. in AI/Evolutionary Computing/readexcel/lib/poi-3.16.jar"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

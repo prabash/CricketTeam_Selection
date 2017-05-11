@@ -1,5 +1,11 @@
+package ga;
+
 import java.util.HashSet;
 import java.util.Set;
+
+import enums.PitchType;
+import enums.PlayerType;
+import objects.PlayerStatistics;
 
 public class FitnessCalculator {
 	// total fitness of the generated team
@@ -254,3 +260,4 @@ public class FitnessCalculator {
 
 	
 }
+
