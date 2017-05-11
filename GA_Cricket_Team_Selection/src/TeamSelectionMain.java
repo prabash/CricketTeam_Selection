@@ -1,11 +1,17 @@
+import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
+import static org.jenetics.engine.limit.bySteadyFitness;
+
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
 import org.jenetics.IntegerChromosome;
 import org.jenetics.IntegerGene;
+import org.jenetics.MeanAlterer;
+import org.jenetics.Mutator;
 import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionResult;
+import org.jenetics.engine.EvolutionStatistics;
 import org.jenetics.util.Factory;
  
 public class TeamSelectionMain {
@@ -55,28 +61,37 @@ public class TeamSelectionMain {
         // 3.) Create the execution environment.
         Engine<IntegerGene, Double> engine = Engine
             .builder(TeamSelectionMain::eval, gtf)
+            .populationSize(1000)
+			.optimize(Optimize.MAXIMUM)
+			.alterers(
+					new Mutator<>(0.03),
+					new MeanAlterer<>(0.6))
             .build();
         
-	 
+        // Create evolution statistics consumer.
+     		final EvolutionStatistics<Double, ?>
+     			statistics = EvolutionStatistics.ofNumber();
+     		
         // 4.) Start the execution (evolution) and
         //     collect the result.
-        final EvolutionResult<IntegerGene, Double> result = Engine.builder(TeamSelectionMain::eval, gtf)
-        		 .populationSize(2)
-        		 .offspringFraction(1)
-        	     .optimize(Optimize.MAXIMUM).build()
-        	     .stream()
-        	     .limit(1)
-        	     .collect(EvolutionResult.toBestEvolutionResult());
+     		final Phenotype<IntegerGene, Double> best = engine.stream()
+     				// Truncate the evolution stream after 20 "steady"
+     				// generations.
+     				.limit(bySteadyFitness(20))
+     				// The evolution will stop after maximal 100
+     				// generations.
+     				.limit(100)
+     				// Update the evaluation statistics after
+     				// each generation
+     				.peek(statistics)
+     				//.peek(compStatistics)
+     				// Collect (reduce) the evolution stream to
+     				// its best phenotype.
+     				.collect(toBestPhenotype());
          
-        System.out.println("\n ++++++++++++++++++++++++++ RESULTS : ++++++++++++++++++++ \n");
-        System.out.println(result.getBestFitness());
-        System.out.println(result.getTotalGenerations());
-        
-        Phenotype<IntegerGene, Double> finalResults = result.getBestPhenotype();
-        Integer length_ = finalResults.getGenotype().length();
-        for (int i = 0; i < length_; i++) {
-			System.out.println(finalResults.getGenotype().getChromosome(i));
-		}
+     		System.out.println(statistics);
+    		//System.out.println(compStatistics);
+    		System.out.println(best);
     }
 }
 
