@@ -3,6 +3,7 @@ import static org.jenetics.engine.limit.bySteadyFitness;
 
 import java.util.List;
 
+import org.apache.poi.ss.formula.ptg.TblPtg;
 import org.jenetics.*;
 import org.jenetics.engine.*;
 import org.jenetics.util.IntRange;
@@ -54,50 +55,55 @@ public class TestMain {
     
 	public static void main(final String[] args) {
 		PlayerDetails.ReadStatistics();
-		//testFitness();
+		testFitness();
+		//runGAEngine();
 		
+	}
+	private static void runGAEngine(){
 		final Engine<IntegerGene, Double> engine = Engine
-			// Create a new builder with the given fitness
-			// function and chromosome.
-			.builder(TestMain::teamFitness,
-				codecs.ofVector(IntRange.of(1, 26), 11))
-			.populationSize(1000)
-			.optimize(Optimize.MAXIMUM)
-			.alterers(
-					new Mutator<>(0.05),
-					new MeanAlterer<>(0.2))
-			.build();
-		
-		// Create evolution statistics consumer.
-		final EvolutionStatistics<Double, ?>
-			statistics = EvolutionStatistics.ofNumber();
-		final EvolutionStatistics<Double, ?>
-			compStatistics = EvolutionStatistics.ofComparable();
+				// Create a new builder with the given fitness
+				// function and chromosome.
+				.builder(TestMain::teamFitness,
+					codecs.ofVector(IntRange.of(1, 26), 11))
+				.populationSize(1000)
+				.optimize(Optimize.MAXIMUM)
+				.alterers(
+						new Mutator<>(0.05),
+						new MeanAlterer<>(0.2))
+				.build();
+			
+			// Create evolution statistics consumer.
+			final EvolutionStatistics<Double, ?>
+				statistics = EvolutionStatistics.ofNumber();
+			final EvolutionStatistics<Double, ?>
+				compStatistics = EvolutionStatistics.ofComparable();
 
-		final Phenotype<IntegerGene, Double> best = engine.stream()
-			// Truncate the evolution stream after 20 "steady"
-			// generations.
-			.limit(bySteadyFitness(20))
-			// The evolution will stop after maximal 100
-			// generations.
-			.limit(1000)
-			// Update the evaluation statistics after
-			// each generation
-			.peek(statistics)
-			//.peek(compStatistics)
-			// Collect (reduce) the evolution stream to
-			// its best phenotype.
-			.collect(toBestPhenotype());
+			final Phenotype<IntegerGene, Double> best = engine.stream()
+				// Truncate the evolution stream after 20 "steady"
+				// generations.
+				.limit(bySteadyFitness(5))
+				// The evolution will stop after maximal 100
+				// generations.
+				.limit(100)
+				// Update the evaluation statistics after
+				// each generation
+				.peek(statistics)
+				//.peek(compStatistics)
+				// Collect (reduce) the evolution stream to
+				// its best phenotype.
+				.collect(toBestPhenotype());
 
-		System.out.println(statistics);
-		//System.out.println(compStatistics);
-		System.out.println(best);
+			System.out.println(statistics);
+			//System.out.println(compStatistics);
+			System.out.println(best);
 	}
 	
 	//this is just a test method
 	private static void testFitness(){
 
-		int [] team = new int[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+		//int [] team = new int[]{ 1, 2, 5, 6, 10, 12, 15, 16, 23, 25, 26}; //47.30 somethin
+		//int [] team = new int[]{ 23, 26, 15, 12, 7, 3, 8, 14, 19, 17, 2};
+		int [] team = new int[]{ 6, 17, 14, 4, 10, 19, 18, 8, 12, 15, 16};
 		
 		for (PlayerStatistics playerStatistics : PlayerDetails.getTeamDetails(team)) {
 			

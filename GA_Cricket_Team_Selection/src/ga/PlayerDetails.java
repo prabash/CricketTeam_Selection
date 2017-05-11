@@ -115,5 +115,9 @@ public class PlayerDetails {
                         .collect(Collectors.toList());
 		return teamDetails;
 	}
+	
+	public static List<PlayerStatistics> getEntireSquad(){
+		return playerStats;
+	}
 }
 

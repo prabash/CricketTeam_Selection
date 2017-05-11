@@ -18,17 +18,38 @@ public class FitnessCalculator {
 		
 		if (!checkDuplicates(team))
 		{
-			// out of 100
-			double playerFitness = calculatePlayerFitness(team);
-			// out of 100
-			double compFitness = calculateCompFitness(team, reqBowlersCount, reqBowlersCount, reqAllRoundersCount);
-			// out of 20
-			double matchFitness = calculateMatchFitness(team, pitchType);
-			
-			totalFitness = ((playerFitness + compFitness + matchFitness)/220 * 100);
+			if (checkMinTeamCompRequirement(team, reqBatsmenCount, reqBowlersCount, reqAllRoundersCount)){
+
+				// out of 100
+				double playerFitness = calculatePlayerFitness(team);
+				// out of 100
+				double compFitness = calculateCompFitness(team, reqBowlersCount, reqBowlersCount, reqAllRoundersCount);
+				// out of 20
+				double matchFitness = calculateMatchFitness(team, pitchType);
+				
+				totalFitness = ((playerFitness + compFitness + matchFitness)/220 * 100);
+			}
 		}
 		
 		return totalFitness;
+	}
+	
+	private static boolean checkMinTeamCompRequirement(int [] team,
+										      int reqBatsmenCount,
+											  int reqBowlersCount,
+											  int reqAllRoundersCount)
+	{
+		if (Math.abs(reqBatsmenCount - PlayerDetails.getBatsmenCount(team)) > 1){
+			return false;
+		}
+		else if (Math.abs(reqBowlersCount - PlayerDetails.getBowlersCount(team)) > 1){
+		    return false;
+		}
+		else if (Math.abs(reqAllRoundersCount - PlayerDetails.getAllRoundersCount(team)) > 1){
+			return false;
+		}
+		else
+			return true;
 	}
 
 	//will calculate the fitness of all the players of the team using their statistics
@@ -100,16 +121,19 @@ public class FitnessCalculator {
 		else if (playerStats.battingStrikeRate <= 60) batSRFitness = 2;
 		
 		//batting Runs fitness criteria
-		if (playerStats.totalRuns > 1000) batRunsFitness = 20; 	
-		else if (playerStats.totalRuns <= 1000 && playerStats.totalRuns > 900) batRunsFitness = 18;
-		else if (playerStats.totalRuns <= 900 && playerStats.totalRuns > 800) batRunsFitness = 16;
-		else if (playerStats.totalRuns <= 800 && playerStats.totalRuns > 700) batRunsFitness = 14;
-		else if (playerStats.totalRuns <= 700 && playerStats.totalRuns > 600) batRunsFitness = 12;
-		else if (playerStats.totalRuns <= 600 && playerStats.totalRuns > 500) batRunsFitness = 10;
-		else if (playerStats.totalRuns <= 500 && playerStats.totalRuns > 400) batRunsFitness = 8;
-		else if (playerStats.totalRuns <= 400 && playerStats.totalRuns > 300) batRunsFitness = 6;
-		else if (playerStats.totalRuns <= 300 && playerStats.totalRuns > 200) batRunsFitness = 4;
-		else if (playerStats.totalRuns <= 200) batRunsFitness = 2;
+		// total Runs will be estimated for 30 matches to reduce unfairness to new batsmen
+		double estimatedTotal = (playerStats.totalRuns/ playerStats.matchesPlayed) * 30;
+		
+		if (estimatedTotal > 1000) batRunsFitness = 20; 	
+		else if (estimatedTotal <= 1000 && estimatedTotal > 900) batRunsFitness = 18;
+		else if (estimatedTotal <= 900 && estimatedTotal > 800) batRunsFitness = 16;
+		else if (estimatedTotal <= 800 && estimatedTotal > 700) batRunsFitness = 14;
+		else if (estimatedTotal <= 700 && estimatedTotal > 600) batRunsFitness = 12;
+		else if (estimatedTotal <= 600 && estimatedTotal > 500) batRunsFitness = 10;
+		else if (estimatedTotal <= 500 && estimatedTotal > 400) batRunsFitness = 8;
+		else if (estimatedTotal <= 400 && estimatedTotal > 300) batRunsFitness = 6;
+		else if (estimatedTotal <= 300 && estimatedTotal > 200) batRunsFitness = 4;
+		else if (estimatedTotal <= 200) batRunsFitness = 2;
 		
 		//batting Runs fitness criteria
 		if (playerStats.hundredScored > 6) bat100sFitness = 20; 	
