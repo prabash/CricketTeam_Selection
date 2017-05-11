@@ -88,6 +88,7 @@ public class TestMain {
 		System.out.println(best);
 	}
 	
+	//this is just a test method
 	private static void testFitness(){
 
 		int [] team = new int[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
