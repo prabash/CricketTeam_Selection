@@ -32,6 +32,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Dialog;
+import javax.swing.JOptionPane;
 
 import org.jenetics.Chromosome;
 import org.jenetics.Genotype;
@@ -56,7 +58,7 @@ import java.awt.event.ActionEvent;;
 
 public class MainWindow {
 
-	private JFrame frame;
+	private JFrame frmCricketTeamAssistant;
 	private JTextField txtNoOfBatsmen;
 	private JTextField txtNoOfBowlers;
 	private JTextField txtNoOfAllRounders;
@@ -85,6 +87,7 @@ public class MainWindow {
 	private static int noOfAllRounders = 0;
 	private static PitchType pitchType;
 	private JTextField txtTotalFitness;
+	private JTextField txtExcelSheet;
 
 	/**
 	 * Launch the application.
@@ -94,7 +97,7 @@ public class MainWindow {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
+					window.frmCricketTeamAssistant.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -107,34 +110,48 @@ public class MainWindow {
 	 */
 	public MainWindow() {
 		initialize();
-		PlayerDetails.ReadStatistics();
+		txtExcelSheet.setText("C:/Users/Prabash/Documents/GitHub/GA_Cricket_Team_Selection/stats.xls");
+		String fileName = txtExcelSheet.getText();
+		setupInitial(fileName);
 		
-		DefaultTableModel model = (DefaultTableModel)tblCurrentSquad.getModel();
-		model.addColumn("Player ID"); 
-		model.addColumn("Player Name");
-		
-		List<PlayerStatistics> currentSquad = PlayerDetails.getEntireSquad();
-		for (PlayerStatistics playerStatistics : currentSquad) {
-			// Append a row 
-			model.addRow(new Object[]{playerStatistics.playerId, playerStatistics.playerName});
-		}
-		
-		tblCurrentSquad.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-	        public void valueChanged(ListSelectionEvent event) {
-	            // do some actions here, for example
-	            // print first column value from selected row
-	        	if (!event.getValueIsAdjusting() && tblCurrentSquad.getSelectedRow() != -1) {
-	        		int playerId = Integer.parseInt(tblCurrentSquad.getValueAt(tblCurrentSquad.getSelectedRow(), 0).toString());
-	        		SetPlayerDetails(playerId);
-	        	}
-	        }
-	    });
-		
+	}
+	
+	private void setupInitial(String fileName){
+		try {
+			
+			PlayerDetails.ReadStatistics(fileName);
+			
+			DefaultTableModel model = (DefaultTableModel)tblCurrentSquad.getModel();
+			model.addColumn("Player ID"); 
+			model.addColumn("Player Name");
+			
+			List<PlayerStatistics> currentSquad = PlayerDetails.getEntireSquad();
+			for (PlayerStatistics playerStatistics : currentSquad) {
+				// Append a row 
+				model.addRow(new Object[]{playerStatistics.playerId, playerStatistics.playerName});
+			}
+			
+			tblCurrentSquad.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			    public void valueChanged(ListSelectionEvent event) {
+			        // do some actions here, for example
+			        // print first column value from selected row
+			    	if (!event.getValueIsAdjusting() && tblCurrentSquad.getSelectedRow() != -1) {
+			    		int playerId = Integer.parseInt(tblCurrentSquad.getValueAt(tblCurrentSquad.getSelectedRow(), 0).toString());
+			    		SetPlayerDetails(playerId);
+			    	}
+			    }
+			});
+			
 
-		model = (DefaultTableModel)tblSelectedTeam.getModel();
-		model.addColumn("Player ID"); 
-		model.addColumn("Player Name");
-		model.addColumn("Player Role");
+			model = (DefaultTableModel)tblSelectedTeam.getModel();
+			model.addColumn("Player ID"); 
+			model.addColumn("Player Name");
+			model.addColumn("Player Role");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error: Excel sheet cannot be loaded!");
+			// TODO Auto-generated catch block
+			//dia e.getMessage()
+		}
 	}
 	
 	private void SetPlayerDetails(int playerId){
@@ -257,11 +274,12 @@ public class MainWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.getContentPane().setFont(new Font("Segoe UI", Font.PLAIN, 11));
-		frame.setBounds(100, 100, 778, 556);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmCricketTeamAssistant = new JFrame();
+		frmCricketTeamAssistant.setTitle("Cricket Team Assistant");
+		frmCricketTeamAssistant.setResizable(false);
+		frmCricketTeamAssistant.getContentPane().setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		frmCricketTeamAssistant.setBounds(100, 100, 778, 575);
+		frmCricketTeamAssistant.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JLabel lblNewLabel = new JLabel("Cricket Team Assistant");
 		lblNewLabel.setFont(new Font("Segoe UI Light", Font.PLAIN, 16));
@@ -347,7 +365,8 @@ public class MainWindow {
 				.addGroup(gl_panel_4.createSequentialGroup()
 					.addComponent(lblSelectedTeam)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
+					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 263, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(22, Short.MAX_VALUE))
 		);
 		panel_4.setLayout(gl_panel_4);
 		
@@ -359,35 +378,60 @@ public class MainWindow {
 		txtTotalFitness.setEditable(false);
 		txtTotalFitness.setColumns(10);
 		
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
+		JLabel lblDataLocation = new JLabel("Data Location");
+		lblDataLocation.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		
+		txtExcelSheet = new JTextField();
+		txtExcelSheet.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		txtExcelSheet.setColumns(10);
+		
+		JButton btnLoad = new JButton("Load");
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String fileName = txtExcelSheet.getText();
+				setupInitial(fileName);
+			}
+		});
+		btnLoad.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		
+		GroupLayout groupLayout = new GroupLayout(frmCricketTeamAssistant.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(20)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblNewLabel)
-						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel)
+								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblDataLocation, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(txtExcelSheet, GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnLoad)))
+					.addGap(20)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(20)
 							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(30)
+							.addGap(11)
 							.addComponent(lblTotalFitness, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
 							.addComponent(txtTotalFitness, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE)
-							.addGap(20))))
+							.addGap(18))))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(lblNewLabel)
@@ -396,16 +440,18 @@ public class MainWindow {
 								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
 								.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-								.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 478, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(panel_4, 0, 0, Short.MAX_VALUE)
+								.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 286, Short.MAX_VALUE))
+							.addGap(18)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblDataLocation, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
+								.addComponent(txtExcelSheet, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblTotalFitness, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
-								.addComponent(txtTotalFitness, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))))
-					.addGap(22))
+								.addComponent(txtTotalFitness, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnLoad)))
+						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 478, GroupLayout.PREFERRED_SIZE))
+					.addGap(29))
 		);
 		
 			    
@@ -433,7 +479,8 @@ public class MainWindow {
 				.addGroup(gl_panel_3.createSequentialGroup()
 					.addComponent(lblCurrentSquad_1, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 263, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(22, Short.MAX_VALUE))
 		);
 		panel_3.setLayout(gl_panel_3);
 		
@@ -777,6 +824,6 @@ public class MainWindow {
 						.addComponent(txtNoOfAllRounders, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 		);
 		panel.setLayout(gl_panel);
-		frame.getContentPane().setLayout(groupLayout);
+		frmCricketTeamAssistant.getContentPane().setLayout(groupLayout);
 	}
 }

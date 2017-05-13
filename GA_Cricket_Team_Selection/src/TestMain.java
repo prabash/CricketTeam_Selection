@@ -54,7 +54,7 @@ public class TestMain {
     }
     
 	public static void main(final String[] args) {
-		PlayerDetails.ReadStatistics();
+		PlayerDetails.ReadStatistics("C:/Users/Prabash/Documents/GitHub/GA_Cricket_Team_Selection/stats.xls");
 		testFitness();
 		//runGAEngine();
 		

@@ -17,11 +17,11 @@ public class PlayerDetails {
 	
 	// this method has to be called at the beginning
 	// will read the data from the excel sheet
-	public static void ReadStatistics(){
+	public static void ReadStatistics(String filename){
 		
 		List<List<HSSFCell>> stats = null;
 		try {
-			stats = DataManager.readExcel();
+			stats = DataManager.readExcel(filename);
 			System.out.println("Size : " + stats.size());
 			for (int i = 1; i <= 26; i++) {
 				playerStats.add(DataManager.showExcelRowData(stats, i));

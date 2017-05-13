@@ -20,11 +20,11 @@ import objects.PlayerStatistics;
 
 public class DataManager {
 	
-	public static List<List<HSSFCell>> readExcel() throws IOException{
+	public static List<List<HSSFCell>> readExcel(String filename) throws IOException{
 		
 	    // An excel file name. You can create a file name with a full path
 	    // information.
-	    String filename = "C:/Users/Prabash/Documents/GitHub/GA_Cricket_Team_Selection/stats.xls";
+	    //String filename = "C:/Users/Prabash/Documents/GitHub/GA_Cricket_Team_Selection/stats.xls";
 	
 	    // Create an ArrayList to store the data read from excel sheet.
 	    List<List<HSSFCell>> sheetData = new ArrayList<List<HSSFCell>> ();
